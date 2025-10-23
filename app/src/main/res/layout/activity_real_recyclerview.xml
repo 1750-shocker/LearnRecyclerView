@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".RealRecyclerViewActivity">
+
+    <!-- 标题栏 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="真正的 RecyclerView ItemDecoration Demo"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:background="#2196F3"
+        android:textColor="@android:color/white"
+        android:gravity="center" />
 
     <!-- 数据操作按钮 -->
     <LinearLayout
@@ -19,28 +30,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="2dp"
+            android:layout_marginEnd="4dp"
             android:text="添加Item"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btn_remove_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginHorizontal="2dp"
+            android:layout_marginStart="4dp"
             android:text="删除Item"
-            android:textSize="10sp" />
-
-        <Button
-            android:id="@+id/btn_real_recyclerview"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="2dp"
-            android:text="真正的RecyclerView"
-            android:textSize="10sp"
-            android:backgroundTint="#4CAF50" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 
@@ -136,8 +137,8 @@
         android:padding="8dp"
         android:background="#FFF3E0" />
 
-    <com.gta.learnrecyclerview.customlist.CustomListView
-        android:id="@+id/custom_list_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/real_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

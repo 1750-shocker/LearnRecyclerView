@@ -1,27 +1,20 @@
 package com.gta.learnrecyclerview
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.gta.learnrecyclerview.adapter.DemoAdapter
-import com.gta.learnrecyclerview.customlist.CustomListView
-import com.gta.learnrecyclerview.customlist.ItemDecoration
-import com.gta.learnrecyclerview.decoration.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.gta.learnrecyclerview.adapter.RealRecyclerAdapter
 import com.gta.learnrecyclerview.model.DataItem
 import com.gta.learnrecyclerview.model.ItemType
+import com.gta.learnrecyclerview.realdecorations.*
 
-class MainActivity : AppCompatActivity() {
+class RealRecyclerViewActivity : AppCompatActivity() {
     
-    private lateinit var customListView: CustomListView
-    private lateinit var adapter: DemoAdapter
-    private lateinit var btnAddItem: Button
-    private lateinit var btnRemoveItem: Button
-    private lateinit var btnRealRecyclerView: Button
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: RealRecyclerAdapter
     private lateinit var tvCurrentDecoration: TextView
     
     // ItemDecoration 按钮
@@ -32,36 +25,32 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnSpacing: Button
     private lateinit var btnBackground: Button
     private lateinit var btnClear: Button
+    private lateinit var btnAddItem: Button
+    private lateinit var btnRemoveItem: Button
     
     private val dataList = mutableListOf<DataItem>()
     private var itemCounter = 0
     
     // 当前应用的装饰器
-    private var currentDecoration: ItemDecoration? = null
+    private var currentDecoration: RecyclerView.ItemDecoration? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        setContentView(R.layout.activity_real_recyclerview)
         
         initViews()
-        setupCustomListView()
+        setupRecyclerView()
         setupClickListeners()
         setupDecorationListeners()
     }
     
     private fun initViews() {
-        customListView = findViewById(R.id.custom_list_view)
+        recyclerView = findViewById(R.id.real_recycler_view)
+        tvCurrentDecoration = findViewById(R.id.tv_current_decoration)
+        
+        // 数据操作按钮
         btnAddItem = findViewById(R.id.btn_add_item)
         btnRemoveItem = findViewById(R.id.btn_remove_item)
-        btnRealRecyclerView = findViewById(R.id.btn_real_recyclerview)
-        tvCurrentDecoration = findViewById(R.id.tv_current_decoration)
         
         // ItemDecoration 按钮
         btnDivider = findViewById(R.id.btn_divider)
@@ -73,15 +62,16 @@ class MainActivity : AppCompatActivity() {
         btnClear = findViewById(R.id.btn_clear)
     }
     
-    private fun setupCustomListView() {
+    private fun setupRecyclerView() {
         // 初始化数据
         initData()
         
         // 创建适配器
-        adapter = DemoAdapter(dataList)
+        adapter = RealRecyclerAdapter(dataList)
         
-        // 设置适配器
-        customListView.setAdapter(adapter)
+        // 设置RecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
         
         // 默认添加分割线装饰器
         applyDividerDecoration()
@@ -91,8 +81,8 @@ class MainActivity : AppCompatActivity() {
         // 添加Header
         dataList.add(DataItem(
             id = itemCounter++,
-            title = "自定义列表组件Demo",
-            subtitle = "",
+            title = "真正的RecyclerView Demo",
+            subtitle = "ItemDecoration效果展示",
             type = ItemType.HEADER
         ))
         
@@ -100,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         repeat(20) { index ->
             dataList.add(DataItem(
                 id = itemCounter++,
-                title = "列表项 ${index + 1}",
+                title = "RecyclerView 列表项 ${index + 1}",
                 subtitle = "这是第 ${index + 1} 个列表项的副标题",
                 type = ItemType.NORMAL
             ))
@@ -139,15 +129,11 @@ class MainActivity : AppCompatActivity() {
             if (normalItems.isNotEmpty()) {
                 val lastNormalIndex = dataList.indexOfLast { it.type == ItemType.NORMAL }
                 if (lastNormalIndex >= 0) {
-                    adapter.removeItem(lastNormalIndex)
+                    dataList.removeAt(lastNormalIndex)
+                    adapter.notifyItemRemoved(lastNormalIndex)
                     updateFooter()
                 }
             }
-        }
-        
-        btnRealRecyclerView.setOnClickListener {
-            val intent = Intent(this, RealRecyclerViewActivity::class.java)
-            startActivity(intent)
         }
     }
     
@@ -174,75 +160,76 @@ class MainActivity : AppCompatActivity() {
     
     private fun clearCurrentDecoration() {
         currentDecoration?.let {
-            customListView.removeItemDecoration(it)
+            recyclerView.removeItemDecoration(it)
         }
     }
     
     private fun applyDividerDecoration() {
         clearCurrentDecoration()
-        currentDecoration = DividerItemDecoration(
-            dividerHeight = 4,
+        currentDecoration = RealDividerItemDecoration(
+            this,
+            dividerHeight = 2,
             dividerColor = 0xFFE0E0E0.toInt()
         )
-        customListView.addItemDecoration(currentDecoration!!)
+        recyclerView.addItemDecoration(currentDecoration!!)
         tvCurrentDecoration.text = "当前效果：分割线 - 在item之间添加简单的分割线"
     }
     
     private fun applyGridDecoration() {
         clearCurrentDecoration()
-        currentDecoration = GridItemDecoration(
+        currentDecoration = RealGridItemDecoration(
             borderWidth = 3,
             borderColor = 0xFF2196F3.toInt(),
             cornerRadius = 12f
         )
-        customListView.addItemDecoration(currentDecoration!!)
+        recyclerView.addItemDecoration(currentDecoration!!)
         tvCurrentDecoration.text = "当前效果：网格边框 - 为每个item添加圆角边框"
     }
     
     private fun applyShadowDecoration() {
         clearCurrentDecoration()
-        currentDecoration = ShadowItemDecoration(
+        currentDecoration = RealShadowItemDecoration(
             shadowRadius = 12f,
             shadowColor = 0x60000000,
             offsetX = 0f,
             offsetY = 6f,
             cornerRadius = 16f
         )
-        customListView.addItemDecoration(currentDecoration!!)
+        recyclerView.addItemDecoration(currentDecoration!!)
         tvCurrentDecoration.text = "当前效果：阴影效果 - 为每个item添加阴影和圆角背景"
     }
     
     private fun applyStickyDecoration() {
         clearCurrentDecoration()
-        currentDecoration = StickyHeaderDecoration(
+        currentDecoration = RealStickyHeaderDecoration(
             headerHeight = 80,
             headerColor = 0xFFE3F2FD.toInt(),
             textColor = 0xFF1976D2.toInt(),
             textSize = 42f
         )
-        customListView.addItemDecoration(currentDecoration!!)
+        recyclerView.addItemDecoration(currentDecoration!!)
         tvCurrentDecoration.text = "当前效果：分组标题 - 每5个item显示一个分组标题"
     }
     
     private fun applySpacingDecoration() {
         clearCurrentDecoration()
-        currentDecoration = SpacingItemDecoration(
+        currentDecoration = RealSpacingItemDecoration(
             headerSpacing = 8,
             normalSpacing = 24,
             footerSpacing = 48
         )
-        customListView.addItemDecoration(currentDecoration!!)
+        recyclerView.addItemDecoration(currentDecoration!!)
         tvCurrentDecoration.text = "当前效果：智能间距 - 根据item类型设置不同间距"
     }
     
     private fun applyBackgroundDecoration() {
         clearCurrentDecoration()
-        currentDecoration = BackgroundItemDecoration(
+        currentDecoration = RealBackgroundItemDecoration(
             evenColor = 0xFFF3E5F5.toInt(),
             oddColor = 0xFFE8F5E8.toInt(),
             cornerRadius = 12f
         )
-        customListView.addItemDecoration(currentDecoration!!)
+        recyclerView.addItemDecoration(currentDecoration!!)
         tvCurrentDecoration.text = "当前效果：交替背景 - 奇偶行显示不同的背景颜色"
     }
     

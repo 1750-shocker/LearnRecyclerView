@@ -90,13 +90,36 @@ customListView.addItemDecoration(dividerDecoration)
 
 ## Demo功能
 
-当前Demo展示了以下功能：
-
+### 🏠 MainActivity - 自制列表组件
+展示自制CustomListView的功能：
 1. **多种ViewType**: Header、Normal、Footer三种类型
 2. **动态添加**: 点击"添加Item"按钮动态添加列表项
 3. **动态删除**: 点击"删除Item"按钮删除最后一个普通项
-4. **分割线装饰**: 使用`DividerItemDecoration`添加分割线
-5. **数据更新**: 实时更新Footer显示的项目数量
+4. **跳转按钮**: 点击"真正的RecyclerView"跳转到真实RecyclerView页面
+
+### 🎯 RealRecyclerViewActivity - 真正的RecyclerView
+展示真正的RecyclerView ItemDecoration功能：
+
+#### 📱 基础功能
+1. **数据操作**: 动态添加/删除列表项
+2. **多种ViewType**: Header、Normal、Footer三种类型
+3. **实时更新**: 动态更新Footer显示的项目数量
+
+#### 🎨 ItemDecoration效果展示
+4. **分割线效果**: 使用官方API实现的分割线装饰
+5. **网格边框**: 为每个item添加圆角边框
+6. **阴影效果**: 为item添加阴影和圆角背景
+7. **分组标题**: 每5个item显示一个分组标题
+8. **智能间距**: 根据item类型设置不同间距
+9. **交替背景**: 奇偶行显示不同背景颜色
+10. **清除装饰**: 移除所有装饰效果
+
+#### 🔧 学习特性
+- **真实效果**: 使用官方RecyclerView.ItemDecoration API
+- **实时切换**: 可以实时切换不同的ItemDecoration效果
+- **效果说明**: 每种效果都有详细的文字说明
+- **代码示例**: 每个装饰器都有完整的官方API实现
+- **对比学习**: 可以对比自制组件与官方组件的差异
 
 ## 技术特点
 
