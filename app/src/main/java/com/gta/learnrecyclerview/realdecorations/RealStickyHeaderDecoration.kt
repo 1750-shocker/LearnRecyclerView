@@ -48,20 +48,17 @@ class RealStickyHeaderDecoration(
         val itemCount = state.itemCount
 
         // 找到当前应显示的分组标题（基于第一个可见item）
-        val currentGroupTitle = getGroupTitle(topPosition)
+        val currentGroupTitle = getCurrentGroupTitle(topPosition)
         if (currentGroupTitle == null) return
 
         // 默认吸顶位置
         var headerTop = 0f
-        val headerBottom = headerTop + headerHeight
 
-        // 检测下一个分组的第一个child，如果它距离顶部不足一个header高度，则上推当前header
-        val nextGroupChild = findNextGroupChild(parent, itemCount)
-        if (nextGroupChild != null) {
-            val nextTop = nextGroupChild.top.toFloat()
-            if (nextTop < headerBottom) {
-                headerTop = nextTop - headerHeight
-            }
+        // 检测下一个分组的标题区域，如果它即将进入视野，则上推当前header
+        val nextGroupHeaderTop = findNextGroupHeaderTop(parent, itemCount)
+        if (nextGroupHeaderTop != null && nextGroupHeaderTop < headerHeight) {
+            // 当下一个分组标题区域的顶部小于当前header高度时，开始上推
+            headerTop = nextGroupHeaderTop - headerHeight
         }
 
         // 在顶部绘制吸顶标题（全宽）
@@ -100,6 +97,13 @@ class RealStickyHeaderDecoration(
             }
         }
     }
+    
+    private fun getCurrentGroupTitle(position: Int): String? {
+        if (position <= 0) return null
+        // 找到当前position所属的分组
+        val groupIndex = (position - 1) / 5 + 1
+        return "第 $groupIndex 组"
+    }
 
     private fun drawHeaderForChild(canvas: Canvas, child: View, title: String?) {
         if (title == null) return
@@ -113,16 +117,22 @@ class RealStickyHeaderDecoration(
         canvas.drawText(title, textX, textY, textPaint)
     }
 
-    private fun findNextGroupChild(parent: RecyclerView, itemCount: Int): View? {
-        // 遍历可见child，找到下一个分组的第一个child
+    private fun findNextGroupHeaderTop(parent: RecyclerView, itemCount: Int): Float? {
+        val topChild = parent.getChildAt(0)
+        val topPosition = parent.getChildAdapterPosition(topChild)
+        val currentGroupIndex = (topPosition - 1) / 5 + 1
+        
+        // 遍历可见child，找到下一个分组的起始item
         for (i in 0 until parent.childCount) {
             val child = parent.getChildAt(i)
             val position = parent.getChildAdapterPosition(child)
+            
             if (isGroupStart(position, itemCount)) {
-                // 跳过第一个可见组起始，如果它就是topChild对应组，则继续查找下一个
-                // 简单策略：找到距顶部最近且是组起始的child（不等于第一可见）
-                if (child.top > 0) {
-                    return child
+                val childGroupIndex = (position - 1) / 5 + 1
+                // 找到比当前分组更大的分组
+                if (childGroupIndex > currentGroupIndex) {
+                    // 返回该分组标题区域的顶部位置（即child.top - headerHeight）
+                    return child.top.toFloat() - headerHeight
                 }
             }
         }
